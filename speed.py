@@ -7,8 +7,8 @@ from ultralytics import YOLO
 import supervision as sv
 
 # Configuration variables
-SOURCE_VIDEO_PATH = "C:/Users/LENOVO/Desktop/FYP/Vehicle speed Detection/vehicles.mp4"
-TARGET_VIDEO_PATH = "C:/Users/LENOVO/Desktop/FYP/Vehicle speed Detection/output.mp4"
+SOURCE_VIDEO_PATH = "C:/Users/LENOVO/Desktop/FYP/Dynamic Vehicle Speed Detection/vehicles.mp4"
+TARGET_VIDEO_PATH = "C:/Users/LENOVO/Desktop/FYP/Dynamic Vehicle Speed Detection/output.mp4"
 CONFIDENCE_THRESHOLD = 0.3
 IOU_THRESHOLD = 0.7
 
