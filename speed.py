@@ -2,9 +2,9 @@ from collections import defaultdict, deque
 
 import cv2
 import numpy as np
-from ultralytics import YOLO 
+from ultralytics import YOLO
 
-import supervision as sv #library name
+import supervision as sv
 
 # Configuration variables
 SOURCE_VIDEO_PATH = "C:/Users/LENOVO/Desktop/FYP/Dynamic Vehicle Speed Detection/vehicles.mp4"
