@@ -43,6 +43,23 @@ class SpeedDetectionGUI:
         )
         self.speed_value.pack(pady=20)
         
+        # Vehicle type label
+        self.vehicle_type_label = ttk.Label(
+            self.speed_frame,
+            text="Vehicle Type",
+            font=('Arial', 20)
+        )
+        self.vehicle_type_label.pack(pady=10)
+
+        # Vehicle type value (will be updated dynamically)
+        self.vehicle_type_value = ttk.Label(
+            self.speed_frame,
+            text="Unknown",
+            font=('Arial', 30, 'bold')
+        )
+        self.vehicle_type_value.pack(pady=20)
+
+        
         # Initialize video processing components
         self.setup_video_processor()
         
@@ -125,29 +142,35 @@ class SpeedDetectionGUI:
             points = detections.get_anchors_coordinates(anchor=sv.Position.BOTTOM_CENTER)
             points = self.view_transformer.transform_points(points=points).astype(int)
             
-            # Calculate speeds for approaching vehicles only
+            # Initialize tracking variables
             max_speed = 0
+            fastest_vehicle_type = "Unknown"
             labels = []
-            for tracker_id, [_, y] in zip(detections.tracker_id, points):
+
+            for tracker_id, [_, y], class_id in zip(detections.tracker_id, points, detections.class_id):
                 self.coordinates[tracker_id].append(y)
                 
                 if len(self.coordinates[tracker_id]) >= self.video_info.fps / 2:
-                    # Only calculate speed if vehicle is approaching
                     if self.is_vehicle_approaching(self.coordinates[tracker_id]):
                         coordinate_start = self.coordinates[tracker_id][-1]
                         coordinate_end = self.coordinates[tracker_id][0]
                         distance = abs(coordinate_start - coordinate_end)
                         time = len(self.coordinates[tracker_id]) / self.video_info.fps
                         speed = distance / time * 3.6
-                        max_speed = max(max_speed, speed)
+                        
+                        if speed > max_speed:
+                            max_speed = speed
+                            fastest_vehicle_type = self.model.names.get(class_id, "Unknown")  # Safe lookup for vehicle type
+                        
                         labels.append(f"#{tracker_id} {int(speed)} km/h")
                     else:
                         labels.append(f"#{tracker_id}")
                 else:
                     labels.append(f"#{tracker_id}")
-            
-            # Update speed display with fastest approaching vehicle speed
+
+            # Update GUI with fastest vehicle speed and type
             self.speed_value.config(text=f"{int(max_speed)} km/h")
+            self.vehicle_type_value.config(text=fastest_vehicle_type.capitalize())
             
             # Annotate frame
             annotated_frame = frame.copy()
